@@ -74,14 +74,51 @@ class BasicAppTestCase(unittest.TestCase):
             'TZ_AWARE': True
         }, {
             'DB': 'testing_tz_aware_off',
-            'alias' : 'tz_aware_false',
-            'TZ_AWARE' : False
+            'alias': 'tz_aware_false',
+            'TZ_AWARE': False
         }]
         app.config['TESTING'] = True
         db = MongoEngine()
         db.init_app(app)
         self.assertTrue(db.connection['tz_aware_true'].tz_aware)
         self.assertFalse(db.connection['tz_aware_false'].tz_aware)
+
+    def test_connection_missing_db(self):
+        app = flask.Flask(__name__)
+        app.config['MONGODB_SETTINGS'] = {
+            'alias': 'tz_aware_true',
+            'TZ_AWARE': True
+        }
+        app.config['TESTING'] = True
+        db = MongoEngine()
+        try:
+            db.init_app(app)
+            self.assertFalse("ValueError should've been raised")
+        except ValueError:
+            pass
+
+        app.config['MONGODB_HOST'] = 'mongodb://localhost'
+        app.config['TESTING'] = True
+        db = MongoEngine()
+        try:
+            db.init_app(app)
+            self.assertFalse("ValueError should've been raised")
+        except ValueError:
+            pass
+
+    def test_connection_db_only(self):
+        app = flask.Flask(__name__)
+        app.config['MONGODB_SETTINGS'] = {
+            'db': 'test'
+        }
+        app.config['TESTING'] = True
+        db = MongoEngine()
+        db.init_app(app)
+
+        app.config['MONGODB_DB'] = 'test'
+        app.config['TESTING'] = True
+        db = MongoEngine()
+        db.init_app(app)
 
     def test_with_id(self):
         c = self.app.test_client()
