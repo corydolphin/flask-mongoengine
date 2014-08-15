@@ -26,7 +26,12 @@ def _get_connection(conn_settings):
     if 'replicaset' in conn:
         conn['replicaSet'] = conn.pop('replicaset')
 
-    return mongoengine.connect(**conn)
+    if 'db' not in conn:  # Only required argument for mongoengine
+        raise ValueError("Database must be specified. Set either the",
+                         "MONGODB_DB environment variable, or add the key 'db'"
+                         "to the MONGODB_SETTINGS dictionary.")
+
+    return mongoengine.connect(conn.pop('db'), **conn)
 
 
 class MongoEngine(object):
