@@ -28,7 +28,7 @@ setup(
     author='Ross Lawley',
     author_email='ross.lawley@gmail.com',
     description='Flask support for MongoDB and with WTF model forms',
-    long_description=__doc__,
+    long_description=open('docs/index.rst').read(),
     test_suite='nose.collector',
     zip_safe=False,
     platforms='any',
